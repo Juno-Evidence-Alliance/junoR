@@ -3,7 +3,7 @@ Title: junoR
 Version: 0.0.0.9000
 Authors@R: 
     person("Matthew Grainger", , , "matthewjamesgrainger@gmail.com", role = c("aut", "cre"))
-Description: A package with useful functions for Juno Evidence Synthesis
+Description: A package with some useful functions for Juno Evidence Synthesis
 License: AGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
