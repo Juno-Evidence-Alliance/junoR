@@ -1,0 +1,100 @@
+---
+title: "Using R to clean up text"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using R to clean up text}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+When working with text data imported from, for example Excel, you may encounter issues such as:
+
+- Non-printable characters (e.g., zero-width spaces, control characters)
+- Carriage returns (`\r`) and line breaks (`\n`)
+- Bullet points and other unwanted symbols
+
+This document outlines common techniques for cleaning such text using R.
+
+## Loading Required Packages
+
+```{r setup, message=FALSE, warning=FALSE}
+library(stringr)
+```
+
+## Removing Non-Printable Characters
+
+Non-printable characters, such as ASCII control characters, can be removed using `iconv()` or `str_replace_all()`.
+
+```{r}
+clean_nonprintable <- function(text) {
+  text <- iconv(text, "latin1", "ASCII", sub = "") # Removes non-ASCII characters
+  text <- str_replace_all(text, "[^[:print:]]", "") # Removes other control characters
+  return(text)
+}
+
+# Example
+test_text <- "Hello\u0007World!"
+clean_nonprintable(test_text)
+```
+
+## Removing Carriage Returns and Line Breaks
+
+Excel often includes carriage returns (`\r`) and new lines (`\n`) in text data. These can be removed using `gsub()` or `str_replace_all()`.
+
+```{r}
+clean_linebreaks <- function(text) {
+  text <- str_replace_all(text, "\r|\n", " ") # Replace with space
+  return(text)
+}
+
+# Example
+test_text <- "This is line one.\r\nThis is line two."
+clean_linebreaks(test_text)
+```
+
+## Removing Bullets and Special Symbols
+
+Bullet points and other special characters can be removed using regular expressions.
+
+```{r}
+clean_bullets <- function(text) {
+  text <- str_replace_all(text, "[•●▪▶✓✔]", "") # Remove common bullet points
+  return(text)
+}
+
+# Example
+test_text <- "• Item one\n● Item two"
+clean_bullets(test_text)
+```
+
+## Applying All Cleaning Functions
+
+You can create a single function that applies all these cleaning steps.
+
+```{r}
+clean_text <- function(text) {
+  text <- clean_nonprintable(text)
+  text <- clean_linebreaks(text)
+  text <- clean_bullets(text)
+  text <- str_trim(text) # Trim leading/trailing spaces
+  return(text)
+}
+
+# Example
+test_text <- "• Item one\r\n● Item two with \u0007non-printable chars"
+clean_text(test_text)
+```
+
+## Conclusion
+
+These functions help standardise imported text, making it easier to process and analyse in R. 
+
