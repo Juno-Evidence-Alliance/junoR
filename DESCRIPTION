@@ -12,6 +12,8 @@ Suggests:
     testthat (>= 3.0.0),
     quanteda,
     knitr,
-    rmarkdown
+    rmarkdown,
+    textmineR,
+    tm
 Config/testthat/edition: 3
 VignetteBuilder: knitr
