@@ -1,0 +1,185 @@
+---
+title: "An example seeded topic model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{An example seeded topic model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# 1. What is LDA?
+Latent Dirichlet Allocation (LDA) is a probabilistic topic modelling algorithm used to discover hidden topics in a collection of documents.
+
+- Each document is represented as a mixture of topics.
+
+- Each topic is represented as a mixture of words.
+
+`Example: If you analyse news articles, LDA might find topics like "Politics," "Sports," or "Technology," each characterised by related words.`
+
+# 2. What is Seeded LDA?
+
+## Problem with Standard LDA
+
+LDA is an unsupervised method—it doesn't know what topics should be, so the discovered topics may not always align with what you expect.
+
+## Solution: Seeded LDA
+
+In Seeded LDA, we provide seed words for each topic.
+This helps guide the topic formation process so that topics align with meaningful categories.
+
+**Example Use Case:**
+
+If analyzing scientific literature, we may seed topics with specific words:
+
+"Climate Change" → ["warming", "carbon", "emissions"]
+
+"Biodiversity" → ["species", "habitat", "conservation"]
+
+# 3. Seeded LDA Example in R
+We will use the textmineR package to perform Seeded LDA.
+
+## Step 1: Install and Load Packages
+
+```{r, warning=FALSE, message=FALSE}
+#install.packages("textmineR")
+#install.packages("tm")  # For text preprocessing
+
+library(textmineR)
+library(tm)
+
+```
+
+## Step 2: Load Example Text Data
+
+We will use a small dataset of articles.
+
+```{r, warning=FALSE, message=FALSE}
+documents <- c(
+  "Climate change is causing rising temperatures and increasing emissions.",
+  "Renewable energy sources like solar and wind help reduce carbon footprint.",
+  "Biodiversity is under threat due to habitat destruction and pollution.",
+  "Technology companies invest in artificial intelligence and data science.",
+  "Deep learning and neural networks are advancing AI research."
+)
+```
+
+Each document is a separate text entry, and we want to identify themes in them.
+
+## Step 3: Preprocess Text Data
+
+LDA works best with cleaned text. We will:
+
+* Convert text to lowercase
+* Remove stopwords (e.g., "the", "is", "and")
+* Remove punctuation
+* Convert text into a document-term matrix (DTM)
+
+```{r, warning=FALSE, message=FALSE}
+# Create a corpus
+corpus <- Corpus(VectorSource(documents))
+
+# Preprocess: Convert to lowercase, remove stopwords, remove punctuation
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+corpus <- tm_map(corpus, removePunctuation)
+
+# Create a document-term matrix (DTM)
+dtm <- CreateDtm(doc_vec = sapply(corpus, as.character), 
+                 doc_names = paste0("doc", 1:length(documents)), 
+                 ngram_window = c(1,2))  # Unigrams & bigrams
+
+```
+
+## Step 4: Define Seed Words
+
+We guide the model using seed words for each topic:
+
+```{r, warning=FALSE, message=FALSE}
+# Define seed words for topics
+seed_words <- list(
+  "climate_change" = c("climate", "warming", "carbon", "emissions"),
+  "biodiversity" = c("biodiversity", "species", "habitat", "pollution"),
+  "technology" = c("technology", "artificial", "intelligence", "data")
+)
+
+```
+
+### Why Seed Words?
+
+This ensures that LDA associates documents with topics based on expert knowledge.
+Otherwise, random words might define topics in unexpected ways.
+
+## Step 5: Fit Seeded LDA Model
+
+We train the Seeded LDA model:
+
+```{r, warning=FALSE, message=FALSE}
+# Train Seeded LDA
+lda_model <- FitLdaModel(dtm = dtm, 
+                         k = length(seed_words),  # Number of topics
+                         iterations = 500, 
+                         burnin = 100,
+                         seed_words = seed_words)
+```
+
+### Parameters Explained
+* k = length(seed_words): Number of topics (based on how many seed word groups we define).
+
+* iterations = 500: Number of updates to the model.
+
+* burnin = 100: Initial iterations ignored for better convergence.
+
+## Step 6: View Topic Assignments
+
+After training, check which topics dominate each document:
+
+```{r, warning=FALSE, message=FALSE}
+lda_model$theta  # Topic proportions per document
+```
+Here each row = a document and each column = a topic. 
+
+# 4. How to Interpret Results?
+
+Each topic is a probability distribution over words.
+Each document is a probability distribution over topics.
+Words that strongly define topics can be extracted:
+
+```{r}
+get_top_terms <- function(phi, num_words = 10) {
+  apply(phi, 1, function(topic) {
+    names(sort(topic, decreasing = TRUE))[1:num_words]
+  })
+}
+
+get_top_terms(lda_model$phi)  # Top words for each topic
+```
+
+# 5. Standard LDA vs. Seeded LDA
+
+Feature	|Standard LDA|	Seeded LDA
+Topic Discovery	|Unsupervised (random topics)|	Semi-supervised (guided topics)
+Accuracy|	Can be noisy|	More aligned with domain knowledge
+Flexibility|	Fully data-driven|	Requires predefined seed words
+Use Case|	General topic discovery|	When you have expected topics
+
+## When to Use Seeded LDA?
+
+* You expect specific topics and want to guide LDA results.
+
+* You don't want topics to be random.
+
+
+
+
+
+
+
+
+
