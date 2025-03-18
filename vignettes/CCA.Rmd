@@ -70,7 +70,7 @@ result$CCA
 
 ```
 
-This means that `r result$CCA`% of the included studies are redundant.
+This means that `r round(result$CCA)`% of the included studies are redundant.
 
 ## Visualising Study Overlap
 
@@ -99,8 +99,8 @@ Light grey = missing data
 |0-20%|	Low|	Minimal study redundancy across reviews|
 |21-50%|	Moderate|	Some overlap, but different studies are included|
 |51-100%|	High|	High redundancy, reviews rely on similar studies|
+|values greater than 100%	|Extreme	|Indicates a possible error in study categorisation|
 
->100%	Extreme	Indicates a possible error in study categorization
 
 
 ## References
