@@ -1,5 +1,5 @@
 ---
-title: "Corrected Covered Area (CCA) in Systematic Reviews"
+title: "Corrected Covered Area (CCA)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Corrected Covered Area (CCA)}
