@@ -19,6 +19,8 @@
 #' Hedges, L. V., & Olkin, I. (1988). \emph{Statistical Methods for Meta-Analysis}. Academic Press.
 #'
 #' @examples
+#' library(tidyverse)
+#' library(junoR)
 #' # Example dataset
 #' data <- tibble(
 #'   study = rep(paste0("Study_", 1:5), times = 5),

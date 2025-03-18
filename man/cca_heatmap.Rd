@@ -28,6 +28,8 @@ This function calculates the Corrected Covered Area (CCA) for a set of studies
 across systematic reviews and generates a heatmap of study inclusion.
 }
 \examples{
+library(tidyverse)
+library(junoR)
 # Example dataset
 data <- tibble(
   study = rep(paste0("Study_", 1:5), times = 5),
