@@ -1,0 +1,112 @@
+---
+title: "Corrected Covered Area (CCA) in Systematic Reviews"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Corrected Covered Area (CCA)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The **Corrected Covered Area (CCA)** quantifies the overlap of studies included in multiple systematic reviews. A high CCA value indicates a high degree of overlap, suggesting potential redundancy in evidence synthesis.
+
+This vignette explains:
+
+- The formula for CCA
+
+- How to compute CCA in R
+
+- How to visualize study overlap using a heatmap
+
+## CCA Formula
+
+CCA is calculated as:
+
+\[
+CCA = \frac{N - r}{r (c - 1)} \times 100
+\]
+
+Where:
+- \( N \) = total number of study occurrences across reviews
+- \( r \) = number of unique included studies
+- \( c \) = number of systematic reviews
+
+
+
+## Example Data
+
+We use an example dataset with **5 studies** across **5 systematic reviews**:
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(junoR)  
+
+# Example dataset
+data <- tibble(
+  study = rep(paste0("Study_", 1:5), times = 5),
+  review = rep(paste0("Review_", 1:5), each = 5),
+  status = c("included", "included", "ineligible", NA, NA, 
+             NA, "included", NA, "excluded", NA, 
+             "included", NA, "included", "excluded", "ineligible", 
+             "included", "excluded", "included", "excluded", NA, 
+             NA, "included", "ineligible", NA, "excluded")
+)
+
+# View the data
+print(data)
+```
+
+## Compute CCA
+
+We use the `cca_heatmap()` function to compute CCA:
+
+```{r,echo=TRUE, warning=FALSE, message=FALSE}
+# Run the function
+result <- cca_heatmap(data)
+
+# Print CCA result
+result$CCA
+
+```
+
+This means that `r result$CCA`% of the included studies are redundant.
+
+## Visualising Study Overlap
+
+The function also generates a heatmap showing which studies are included in which reviews:
+
+```{r}
+# Generate heatmap
+result$plot
+```
+
+
+This produces a heatmap where:
+
+Green = included studies
+
+Dark grey = excluded studies
+
+Orange = ineligible studies
+
+Light grey = missing data
+
+## Interpretation of Results
+
+|CCA (%)|	Overlap Level|	Interpretation|
+|-------|--------------|----------------|
+|0-20%|	Low|	Minimal study redundancy across reviews|
+|21-50%|	Moderate|	Some overlap, but different studies are included|
+|51-100%|	High|	High redundancy, reviews rely on similar studies|
+
+>100%	Extreme	Indicates a possible error in study categorization
+
+
+## References
+
+Pieper, D., Antoine, S. L., Mathes, T., Neugebauer, E. A., & Eikermann, M. (2014).
+Systematic review finds overlapping reviews were not mentioned in every other overview.
+Journal of Clinical Epidemiology, 67(4), 368–375. DOI: 10.1016/j.jclinepi.2013.11.007
+
+Hedges, L. V., & Olkin, I. (1988). Statistical Methods for Meta-Analysis. Academic Press.
