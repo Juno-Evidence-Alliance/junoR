@@ -40,7 +40,7 @@
 #'
 #' plot_CEESTAT(review_data)
 #' @export
-plot_CEESTATy <- function(df,
+plot_CEESTAT <- function(df,
                                 palette = c(
                                   Gold = "#b28800",
                                   Green = "#00a651",
